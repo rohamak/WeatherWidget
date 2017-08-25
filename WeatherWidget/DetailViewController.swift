@@ -52,22 +52,27 @@ class DetailViewController: UIViewController {
         // Update the user interface for the detail item.
         if let city = cities?[curIndex] {
             city.loadCurrentWeather {
-                DispatchQueue.main.sync { [unowned self] in
-                    self.navigationItem.title = city.name
-                    self.lblWeatherMain?.text = city.WCur?.weatherMain
-                    if let weatherDesc = city.WCur?.weatherDesc,
-                        let text = self.lblWeatherMain?.text {
-                        self.lblWeatherMain?.text = text + " - " + weatherDesc
+                // In case user hits back button before this closure is called
+                DispatchQueue.main.sync { [weak self] in
+                    if let weakSelf = self {
+                        weakSelf.navigationItem.title = city.name
+                        weakSelf.lblWeatherMain?.text = city.WCur?.weatherMain
+                        if let weatherDesc = city.WCur?.weatherDesc,
+                            let text = weakSelf.lblWeatherMain?.text {
+                            weakSelf.lblWeatherMain?.text = text + " - " + weatherDesc
+                        }
+                        weakSelf.lblTemperature?.text = String(format: "%.0f", city.WCur?.temperature ?? 0.0)
+                        weakSelf.lblUnit?.text = City.isMetrics ? "º" : "F"
+                        weakSelf.lblWindSpeed?.text = city.WCur?.fmtWindSpeed
+                        weakSelf.lblWindDirection?.text = city.WCur?.fmtWindDir
                     }
-                    self.lblTemperature?.text = String(format: "%.0f", city.WCur?.temperature ?? 0.0)
-                    self.lblUnit?.text = City.isMetrics ? "º" : "F"
-                    self.lblWindSpeed?.text = city.WCur?.fmtWindSpeed
-                    self.lblWindDirection?.text = city.WCur?.fmtWindDir
                 }
                 // Now load the forecast
                 city.load5DaysForecast {
-                    DispatchQueue.main.sync { [unowned self] in
-                        self.tbl.reloadData()
+                    DispatchQueue.main.sync { [weak self] in
+                        if let weakSelf = self {
+                            weakSelf.tbl.reloadData()
+                        }
                     }
                 }
             }

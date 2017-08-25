@@ -160,18 +160,18 @@ class City : DataTransport {
 
         if let i = self.id {
             let strUrl = String(format: strUrlForecast, String(i), self.apiKey)
-            self.loadJSONData(strUrl, []) { [unowned self] dic in
+            self.loadJSONData(strUrl, []) { [weak self] dic in
                 if let dic = dic as? Dictionary<String, Any>,
                     let list = dic["list"] as? Array<Any>,
                     list.count > 0 {
-                    self.WForecast = []
+                    self?.WForecast = []
                     for itm in list {
                         if let item = itm as? Dictionary<String, Any> {
                             var wc = WeatherCond()
                             // The following is for populating the Weather structure
                             // Only add forecast days ahead of today
                             if let dt = item["dt"] as? TimeInterval,
-                                let dt1 = self.WCur?.dt,
+                                let dt1 = self?.WCur?.dt,
                                 dt > dt1 {
                                 wc.dt = dt
                                 if let pressure = item["pressure"] as? Float { wc.pressure = pressure }
@@ -190,7 +190,7 @@ class City : DataTransport {
                                     if let description = weather["description"] as? String { wc.weatherDesc = description }
                                     if let icon = weather["icon"] as? String { wc.weatherIcon = icon }
                                 }
-                                self.WForecast.append(wc)
+                                self?.WForecast.append(wc)
                             }
                         }
                     }

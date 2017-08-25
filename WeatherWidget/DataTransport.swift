@@ -67,6 +67,7 @@ class DataTransport {
         retVal = retVal.appendingFormat("&units=%@&lang=%@", DataTransport.units, self.lang)
         return retVal
     }
+    
     /// Loads JSON data from a url, traversing the returned dictionary
     ///
     /// - Parameters:
@@ -76,17 +77,19 @@ class DataTransport {
 
         let urlString = self.addUrlLocalizations(fromUrlString)
 
-        URLSession.shared.dataTask(with: URL(string: urlString)!, completionHandler: {  [unowned self] (data, response, error) -> Void  in
-
-            if let err = error {
-                self.errors.append(err)
-            } else if let dt = data {
-                do {
-                    let dic = try JSONSerialization.jsonObject(with: dt, options: .mutableLeaves)
-                    completionHandler(self.parseDic(dic, nodePath))
-                } catch  {
-                    self.errors.append(error)
-                    completionHandler([:])
+        URLSession.shared.dataTask(with: URL(string: urlString)!, completionHandler: {  [weak self] (data, response, error) -> Void  in
+            
+            if let weakSelf = self {
+                if let err = error {
+                    weakSelf.errors.append(err)
+                } else if let dt = data {
+                    do {
+                        let dic = try JSONSerialization.jsonObject(with: dt, options: .mutableLeaves)
+                        completionHandler(weakSelf.parseDic(dic, nodePath))
+                    } catch  {
+                        weakSelf.errors.append(error)
+                        completionHandler([:])
+                    }
                 }
             }
         }).resume()
