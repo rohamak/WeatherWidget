@@ -140,10 +140,16 @@ class City : DataTransport {
     func loadCW(_ strUrl: String, _ completionHandler: @escaping () -> Void) {
 
         self.loadJSONData(strUrl, []) { [unowned self] dic in
-            if let dic = dic as? DicReg,
-                let list = dic["list"] as? Array<Any>,
+            if let dic = dic as? DicReg {
+                var item: DicReg!
+                // The returned dictionary maybe contained in an array list
+                if let list = dic["list"] as? Array<Any>,
                 list.count > 0,
-                let item = list[0] as? DicReg {
+                let itm = list[0] as? DicReg {
+                    item = itm
+                } else {
+                    item = dic
+                }
                 var wc = WeatherCond()
                 
                 if let id = item["id"] as? Int { self.id = id }

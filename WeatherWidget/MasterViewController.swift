@@ -81,6 +81,7 @@ class MasterViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        self.tableView.reloadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -90,6 +91,7 @@ class MasterViewController: UITableViewController {
 
     /// This will store unsaved data
     func applicationWillResign() {
+        self.latLon = nil
         // Update the user defaults
         if cities.count > 0 {           //  To avoid creating an object if we have one in the array
             cities[0].storeCities(self.allCities)
@@ -138,7 +140,7 @@ class MasterViewController: UITableViewController {
     @IBAction func btnFavoritehandler(_ sender: UIButton) {
         
         let buttonPosition: CGPoint  = sender.convert(.zero, to: self.tableView)
-        if let indexPath: NSIndexPath = self.tableView.indexPathForRow(at: buttonPosition) as NSIndexPath? {
+        if let indexPath = self.tableView.indexPathForRow(at: buttonPosition) as NSIndexPath? {
             if let sc = Sections(rawValue: indexPath.section) {
                 switch sc {
                 case .coordinates:
@@ -147,18 +149,29 @@ class MasterViewController: UITableViewController {
                         self.locationManager = nil
                         MasterCellView.select(button: sender, withTint: .blue, selected: false)
                     } else {
+                        let act = UIActivityIndicatorView(activityIndicatorStyle: .white)
+                        sender.addSubview(act)
+                        act.center = sender.center
+                        act.startAnimating()
                         self.locationManager = LocationManager() { [unowned self] err, latLon in
-                            if let ll = latLon {
-                                self.latLon = ll
-                                MasterCellView.select(button: sender, withTint: .blue, selected: true)
-                            } else {
-                                MasterCellView.select(button: sender, withTint: .blue, selected: false)
-                                // Show error message
-                                let alert = UIAlertController(title: .none, message:
-                                    err ?? "Fatal Error", preferredStyle: .alert)
-                                alert.addAction(UIAlertAction(title: NSLocalizedString("Okay", comment: ""),
-                                                              style: .cancel))
-                                self.present(alert, animated: true, completion: .none)
+                            DispatchQueue.main.async {
+                                if let ll = latLon {
+                                    self.latLon = ll
+                                    MasterCellView.select(button: sender, withTint: .blue, selected: true)
+                                    if let cell = self.tableView.cellForRow(at: indexPath as IndexPath) as? MasterCellView {
+                                        cell.lblName.text = NSLocalizedString("Current Location", comment: "")
+                                    }
+                                } else {
+                                    MasterCellView.select(button: sender, withTint: .blue, selected: false)
+                                    // Show error message
+                                    let alert = UIAlertController(title: .none, message:
+                                        err ?? "Fatal Error", preferredStyle: .alert)
+                                    alert.addAction(UIAlertAction(title: NSLocalizedString("Okay", comment: ""),
+                                                                  style: .cancel))
+                                    self.present(alert, animated: true, completion: .none)
+                                }
+                                act.stopAnimating()
+                                act.removeFromSuperview()
                             }
                         }
                     }
@@ -224,7 +237,11 @@ class MasterViewController: UITableViewController {
         if let sc = Sections(rawValue: indexPath.section) {
             switch sc {
             case .coordinates:
-                cell.lblName.text = NSLocalizedString("Current Location", comment: "")
+                if self.latLon != nil {
+                    cell.lblName.text = NSLocalizedString("Current Location", comment: "")
+                } else {
+                    cell.lblName.text = NSLocalizedString("Find Current Location", comment: "")
+                }
                 cell.btnTintColor = .blue
                 cell.setImageViewImage(#imageLiteral(resourceName: "location"))
                 cell.selectButton(selected: locationManager != nil)
@@ -243,6 +260,9 @@ class MasterViewController: UITableViewController {
 
         if let sc = Sections(rawValue: indexPath.section) {
             if sc == .coordinates && self.latLon == nil {
+                if let cell = tableView.cellForRow(at: indexPath) as? MasterCellView {
+                    self.btnFavoritehandler(cell.btnFavorite)
+                }
                 return nil     //  should be disabled, user should activate location manager first
             }
         }
