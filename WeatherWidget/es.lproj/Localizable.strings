@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  WeatherWidget
+
+  Created by Roham Akbari on 2017-08-27.
+  Copyright © 2017 bioDigits LTD. All rights reserved.
+*/
+
+"Search"            =   "Buscar"    ;
+"Enter City Name"   =   "ingrese el nombre de la ciudad"   ;
+"City Name"         =   "Nombre de la ciudad" ;
+"Okay"              =   "Bueno"      ;
+"Cancel"            =   "Cancelar"   ;
+"All"               =   "Todas"      ;
+"Favorites"         =   "Favoritos"  ;
+"Wind"              =   "Viento"     ;
+
+"Settings"          =   "Ajustes"  ;
+"Current Location"  =   "Ubicación actual"  ;
+"Location Access Restricted" = "Ubicación Acceso restringido";

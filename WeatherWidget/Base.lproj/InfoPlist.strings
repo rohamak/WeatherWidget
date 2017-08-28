@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  WeatherWidget
+
+  Created by Roham Akbari on 2017-08-28.
+  Copyright © 2017 bioDigits LTD. All rights reserved.
+*/
+CFBundleDisplayName = "WeatherWidget";
+/* vs. NSLocationAlwaysUsageDescription Localized version of location services purpose for Info.plist  = NSLocalizedString1(@"Auto Update Message", @"") */
+NSLocationWhenInUseUsageDescription = "Current Location Weather";

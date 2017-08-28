@@ -13,16 +13,36 @@ class MasterCellView: UITableViewCell {
     @IBOutlet weak var lblName: UILabel!
     @IBOutlet weak var btnFavorite: UIButton!
     
+    var btnTintColor: UIColor = UIColor.darkGray
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        let img = btnFavorite.imageView?.image?.withRenderingMode(.alwaysTemplate)
+    }
+    
+    func setImageViewImage(_ image: UIImage) {
+        let img = image.withRenderingMode(.alwaysTemplate)
         btnFavorite.setImage(img, for: .normal)
         btnFavorite.setImage(img, for: .selected)
+    }
+    
+    func selectButton(selected: Bool = true) {
+        MasterCellView.select(button: self.btnFavorite, withTint: self.btnTintColor, selected: selected)
+    }
+    
+    static func select(button: UIButton, withTint: UIColor, selected: Bool = true) {
+        button.isSelected = selected
+        button.tintColor = selected ? withTint : UIColor.darkGray
     }
 }
 
 class MasterViewController: UITableViewController {
 
+    @IBOutlet weak var sgmFilter: UISegmentedControl!
+    
+    enum Sections: Int {
+        case coordinates, cityNames
+    }
+    
     var detailViewController: DetailViewController? = nil
     var allCities: Array<City> = {
         return City().loadCities()
@@ -32,6 +52,9 @@ class MasterViewController: UITableViewController {
     lazy var cities: Array<City> = {
         return self.allCities
     }()
+    
+    var locationManager: LocationManager? = nil
+    var latLon: LatLon?
 
     deinit {
         NotificationCenter.default.removeObserver(self, name: .UIApplicationWillResignActive, object: nil)
@@ -49,6 +72,9 @@ class MasterViewController: UITableViewController {
         if let split = splitViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+        }
+        for i in 0..<sgmFilter.numberOfSegments {
+            sgmFilter.setTitle(NSLocalizedString(sgmFilter.titleForSegment(at: i) ?? "", comment: ""), forSegmentAt: i)
         }
     }
 
@@ -85,13 +111,14 @@ class MasterViewController: UITableViewController {
     }
 
     func insertNewObject(_ sender: Any) {
-
-        let alert = UIAlertController(title: "Search", message: "Enter City Name", preferredStyle: .alert)
+        
+        let alert = UIAlertController(title: NSLocalizedString("Search", comment: ""),
+                                      message: NSLocalizedString("Enter City Name", comment: ""), preferredStyle: .alert)
         alert.addTextField(configurationHandler: { textField in
-            textField.placeholder = "City Name"
+            textField.placeholder = NSLocalizedString("City Name", comment: "")
             textField.autocapitalizationType = .words
         })
-        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: { action  in
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Okay", comment: ""), style: .default, handler: { action  in
             if let text = alert.textFields?[0].text {
                 let city = City(text)
                 city.loadCurrentWeather { [unowned self] in
@@ -103,7 +130,7 @@ class MasterViewController: UITableViewController {
                 }
             }
         }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
         
         self.present(alert, animated: true, completion: nil)
     }
@@ -112,16 +139,39 @@ class MasterViewController: UITableViewController {
         
         let buttonPosition: CGPoint  = sender.convert(.zero, to: self.tableView)
         if let indexPath: NSIndexPath = self.tableView.indexPathForRow(at: buttonPosition) as NSIndexPath? {
-            if cities[indexPath.row].favorite {
-                cities[indexPath.row].favorite = false
-                sender.isSelected = false
-                sender.imageView?.tintColor = UIColor.darkGray
-            } else {
-                cities[indexPath.row].favorite = true
-                sender.isSelected = true
-                sender.imageView?.tintColor = UIColor.orange
+            if let sc = Sections(rawValue: indexPath.section) {
+                switch sc {
+                case .coordinates:
+                    if let lm = self.locationManager {
+                        lm.stopLocationManager()
+                        self.locationManager = nil
+                        MasterCellView.select(button: sender, withTint: .blue, selected: false)
+                    } else {
+                        self.locationManager = LocationManager() { [unowned self] err, latLon in
+                            if let ll = latLon {
+                                self.latLon = ll
+                                MasterCellView.select(button: sender, withTint: .blue, selected: true)
+                            } else {
+                                MasterCellView.select(button: sender, withTint: .blue, selected: false)
+                                // Show error message
+                                let alert = UIAlertController(title: .none, message:
+                                    err ?? "Fatal Error", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: NSLocalizedString("Okay", comment: ""),
+                                                              style: .cancel))
+                                self.present(alert, animated: true, completion: .none)
+                            }
+                        }
+                    }
+                case .cityNames:
+                    if cities[indexPath.row].favorite {
+                        cities[indexPath.row].favorite = false
+                        MasterCellView.select(button: sender, withTint: .orange, selected: false)
+                    } else {
+                        cities[indexPath.row].favorite = true
+                        MasterCellView.select(button: sender, withTint: .orange, selected: true)
+                    }
+                }
             }
-            
         }
     }
     // MARK: - Segues
@@ -133,7 +183,16 @@ class MasterViewController: UITableViewController {
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 //controller.cities = object
                 controller.curIndex = indexPath.row
-                controller.cities = self.cities
+                if let sc = Sections(rawValue: indexPath.section) {
+                    switch sc {
+                    case .coordinates:
+                        if let ll = self.latLon {
+                            controller.cities = [City(ll)]
+                        }
+                    case .cityNames:
+                        controller.cities = self.cities
+                    }
+                }
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
@@ -143,25 +202,51 @@ class MasterViewController: UITableViewController {
     // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cities.count
+        var retVal = 0
+        if let sc = Sections(rawValue: section) {
+            switch sc {
+            case .coordinates:
+                retVal = 1
+            case .cityNames:
+                retVal = cities.count
+            }
+        }
+        return retVal
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! MasterCellView
 
-        let aCity = cities[indexPath.row]
-        cell.lblName.text = aCity.name
-        cell.btnFavorite.isSelected = aCity.favorite
-        if aCity.favorite {
-            cell.btnFavorite.imageView?.tintColor = UIColor.orange
-        } else {
-            cell.btnFavorite.imageView?.tintColor = UIColor.darkGray
+        if let sc = Sections(rawValue: indexPath.section) {
+            switch sc {
+            case .coordinates:
+                cell.lblName.text = NSLocalizedString("Current Location", comment: "")
+                cell.btnTintColor = .blue
+                cell.setImageViewImage(#imageLiteral(resourceName: "location"))
+                cell.selectButton(selected: locationManager != nil)
+            case .cityNames:
+                let aCity = cities[indexPath.row]
+                cell.lblName.text = aCity.name
+                cell.btnTintColor = .orange
+                cell.setImageViewImage(#imageLiteral(resourceName: "star"))
+                cell.selectButton(selected: aCity.favorite)
+            }
         }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+
+        if let sc = Sections(rawValue: indexPath.section) {
+            if sc == .coordinates && self.latLon == nil {
+                return nil     //  should be disabled, user should activate location manager first
+            }
+        }
+        return indexPath
     }
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

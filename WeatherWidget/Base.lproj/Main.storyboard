@@ -164,6 +164,7 @@
                                             <outlet property="lblMin" destination="C4I-Zn-exQ" id="qnV-Wu-EUb"/>
                                             <outlet property="lblWeatherMain" destination="Zbh-uc-2Cj" id="x6d-06-TGb"/>
                                             <outlet property="lblWeekday" destination="l4J-qS-pcM" id="B8C-cv-kFt"/>
+                                            <outlet property="lblWind" destination="AHR-Ew-Hzb" id="B9C-0R-eoV"/>
                                             <outlet property="lblWindDirection" destination="iwL-1f-HJ0" id="PT4-4G-wej"/>
                                             <outlet property="lblWindSpeed" destination="sgu-A0-bLh" id="uCa-FK-ogf"/>
                                         </connections>
@@ -201,6 +202,7 @@
                         <outlet property="lblTemperature" destination="1jn-KG-c5L" id="zqe-43-BJc"/>
                         <outlet property="lblUnit" destination="CGr-V7-ma4" id="uc8-rH-lap"/>
                         <outlet property="lblWeatherMain" destination="f7w-Po-pqs" id="vKA-V6-pcq"/>
+                        <outlet property="lblWind" destination="7fI-zd-Hux" id="M9f-DC-0eI"/>
                         <outlet property="lblWindDirection" destination="3Bj-Ho-yyj" id="EWb-XQ-Hb9"/>
                         <outlet property="lblWindSpeed" destination="WBX-61-9OO" id="51E-ar-CVE"/>
                         <outlet property="tbl" destination="5n2-Pf-WkP" id="p2E-KA-Eza"/>
@@ -296,6 +298,9 @@
                             </connections>
                         </segmentedControl>
                     </navigationItem>
+                    <connections>
+                        <outlet property="sgmFilter" destination="V6x-j3-TX8" id="ufG-3S-Vf9"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -319,7 +324,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="star" width="80" height="80"/>
+        <image name="star" width="40" height="40"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="6S0-TO-JiA"/>

@@ -57,27 +57,37 @@ struct WeatherCond {
     var fmtWindSpeed: String = ""
 }
 
+typealias DicReg = Dictionary<String, Any>
 /// Class to wrap city entity, for which weather should be retrieved
 class City : DataTransport {
 
     /// Name of the city this object is referring to
+    var latLon: LatLon?
     var name: String?
     var id: Int?
     var favorite: Bool = false
     let strUrlForecast = "http://api.openweathermap.org/data/2.5/forecast/daily?id=%@&APPID=%@"
     let strUrlCurW     = "http://api.openweathermap.org/data/2.5/find?q=%@&type=like&APPID=%@"
+    let strUrlCurWLL   = "http://api.openweathermap.org/data/2.5/weather?lat=%.4f&lon=%.4f&APPID=%@"
     let strUrlIcon     = "http://openweathermap.org/img/w/%@.png"
     var WCur: WeatherCond?
     var WForecast: Array<WeatherCond> = []
     
+    var task: (AnyObject & DataTask)?
+    
     override init() {
-        self.name = ""
+        //self.name = ""
         self.id = 0
         super.init()
     }
     convenience init(_ name: String) {
         self.init()
         self.name = name
+    }
+    
+    convenience init(_ latLon: LatLon) {
+        self.init()
+        self.latLon = latLon
     }
     
     /// Converts array of value data types into class objects
@@ -103,7 +113,7 @@ class City : DataTransport {
     ///
     /// - Parameter cities: Array of City objects
     func storeCities(_ cities: Array<City>) {
-        var arCities = [Dictionary<String, Any>]()
+        var arCities = [DicReg]()
         for aCity in cities {
             arCities.append(["name": aCity.name ?? "", "favorite": aCity.favorite])
         }
@@ -111,48 +121,57 @@ class City : DataTransport {
     }
     
     func loadCurrentWeather(_ completionHandler: @escaping () -> Void) {
-
         if let name = self.name?.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-
+            
             let strUrl = String(format: strUrlCurW, name , self.apiKey)
+            self.loadCW(strUrl, completionHandler)
 
-            self.loadJSONData(strUrl, []) { [unowned self] dic in
-                if let dic = dic as? Dictionary<String, Any>,
-                    let list = dic["list"] as? Array<Any>,
-                        list.count > 0,
-                    let item = list[0] as? Dictionary<String, Any> {
-                    var wc = WeatherCond()
+        } else if let ll = latLon {
 
-                    if let id = item["id"] as? Int { self.id = id }
-                    if let name = item["name"] as? String { self.name = name }  //  Get the properly formatted name
+            let strUrl = String(format: strUrlCurWLL, ll.lat, ll.lon , self.apiKey)
+            self.loadCW(strUrl, completionHandler)
 
-                    // The following is for populating the Weather structure
-                    if let dt = item["dt"] as? TimeInterval { wc.dt = dt }
-                    if let main = item["main"] as? Dictionary<String, Any> {
-                        if let temp = main["temp"] as? Float { wc.temperature = temp }
-                        if let pressure = main["pressure"] as? Float { wc.pressure = pressure }
-                        if let humidity = main["humidity"] as? Float { wc.humidity = humidity }
-                        if let min = main["temp_min"] as? Float { wc.min = min }
-                        if let max = main["temp_max"] as? Float { wc.max = max }
-                    }
-                    if let wind = item["wind"] as? Dictionary<String, Any> {
-                        if let speed = wind["speed"] as? Float { wc.windSpeed = speed }
-                        if let deg = wind["deg"] as? Float { wc.windDirection = deg }
-                    }
-                    if let weatherList = item["weather"] as? Array<Any>,
-                            weatherList.count > 0,
-                            let weather = weatherList[0] as? Dictionary<String, Any> {
-                        if let main = weather["main"] as? String { wc.weatherMain = main }
-                        if let description = weather["description"] as? String { wc.weatherDesc = description }
-                        if let icon = weather["icon"] as? String { wc.weatherIcon = icon }
-                    }
-                    self.WCur = wc
-                }
-                completionHandler()     //  let the UI update itself
-            }
         } else {
             self.errors.append("City name is blank")
             completionHandler()         //  let the UI update itself
+        }
+    }
+    
+    func loadCW(_ strUrl: String, _ completionHandler: @escaping () -> Void) {
+
+        self.loadJSONData(strUrl, []) { [unowned self] dic in
+            if let dic = dic as? DicReg,
+                let list = dic["list"] as? Array<Any>,
+                list.count > 0,
+                let item = list[0] as? DicReg {
+                var wc = WeatherCond()
+                
+                if let id = item["id"] as? Int { self.id = id }
+                if let name = item["name"] as? String { self.name = name }  //  Get the properly formatted name
+                
+                // The following is for populating the Weather structure
+                if let dt = item["dt"] as? TimeInterval { wc.dt = dt }
+                if let main = item["main"] as? DicReg {
+                    if let temp = main["temp"] as? Float { wc.temperature = temp }
+                    if let pressure = main["pressure"] as? Float { wc.pressure = pressure }
+                    if let humidity = main["humidity"] as? Float { wc.humidity = humidity }
+                    if let min = main["temp_min"] as? Float { wc.min = min }
+                    if let max = main["temp_max"] as? Float { wc.max = max }
+                }
+                if let wind = item["wind"] as? DicReg {
+                    if let speed = wind["speed"] as? Float { wc.windSpeed = speed }
+                    if let deg = wind["deg"] as? Float { wc.windDirection = deg }
+                }
+                if let weatherList = item["weather"] as? Array<Any>,
+                    weatherList.count > 0,
+                    let weather = weatherList[0] as? DicReg {
+                    if let main = weather["main"] as? String { wc.weatherMain = main }
+                    if let description = weather["description"] as? String { wc.weatherDesc = description }
+                    if let icon = weather["icon"] as? String { wc.weatherIcon = icon }
+                }
+                self.WCur = wc
+            }
+            completionHandler()     //  let the UI update itself
         }
     }
     
@@ -161,12 +180,12 @@ class City : DataTransport {
         if let i = self.id {
             let strUrl = String(format: strUrlForecast, String(i), self.apiKey)
             self.loadJSONData(strUrl, []) { [weak self] dic in
-                if let dic = dic as? Dictionary<String, Any>,
+                if let dic = dic as? DicReg,
                     let list = dic["list"] as? Array<Any>,
                     list.count > 0 {
                     self?.WForecast = []
                     for itm in list {
-                        if let item = itm as? Dictionary<String, Any> {
+                        if let item = itm as? DicReg {
                             var wc = WeatherCond()
                             // The following is for populating the Weather structure
                             // Only add forecast days ahead of today
@@ -178,14 +197,14 @@ class City : DataTransport {
                                 if let humidity = item["humidity"] as? Float { wc.humidity = humidity }
                                 if let speed = item["speed"] as? Float { wc.windSpeed = speed }
                                 if let deg = item["deg"] as? Float { wc.windDirection = deg }
-                                if let temp = item["temp"] as? Dictionary<String, Any> {
+                                if let temp = item["temp"] as? DicReg {
                                     if let day = temp["day"] as? Float { wc.temperature = day }
                                     if let min = temp["min"] as? Float { wc.min = min }
                                     if let max = temp["max"] as? Float { wc.max = max }
                                 }
                                 if let weatherList = item["weather"] as? Array<Any>,
                                     weatherList.count > 0,
-                                    let weather = weatherList[0] as? Dictionary<String, Any> {
+                                    let weather = weatherList[0] as? DicReg {
                                     if let main = weather["main"] as? String { wc.weatherMain = main }
                                     if let description = weather["description"] as? String { wc.weatherDesc = description }
                                     if let icon = weather["icon"] as? String { wc.weatherIcon = icon }

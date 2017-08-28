@@ -9,6 +9,16 @@
 import Foundation
 import UIKit
 
+protocol DataTask {
+    func cancelTask()
+}
+
+extension URLSessionDataTask: DataTask {
+    func cancelTask() {
+        self.cancel()
+    }
+}
+
 class DataTransport {
     
     /// Intermediate variable for dependency injection
@@ -22,19 +32,18 @@ class DataTransport {
     
     static let lang: String = {
         var retVal = "en"
-        let ar = NSLocale.preferredLanguages
-        if ar.count > 0 {
-            retVal = ar[0]
+        if let l = NSLocale.current.languageCode {
+            retVal = l
         }
         return retVal
     }()
 
     static let isMetrics: Bool = {
-        return DataTransport.units == "metrics"
+        return DataTransport.units == "metric"
     }()
     
     static let units: String = {
-        var retVal = "metrics"
+        var retVal = "metric"
         if !NSLocale.current.usesMetricSystem {
             retVal = "imperial"
         }
@@ -43,7 +52,6 @@ class DataTransport {
 
     let citiesTable = "Cities"
     let apiKey = "58d58b185631f850edc5928ed7a690d7"
-    var lang  = "en"
     var errors: Array<Any> = []
     
     func loadCities() -> Array<Dictionary<String, Any>> {
@@ -64,7 +72,7 @@ class DataTransport {
     
     func addUrlLocalizations( _ urlString: String) -> String {
         var retVal = urlString
-        retVal = retVal.appendingFormat("&units=%@&lang=%@", DataTransport.units, self.lang)
+        retVal = retVal.appendingFormat("&units=%@&lang=%@", DataTransport.units, DataTransport.lang)
         return retVal
     }
     
@@ -85,7 +93,7 @@ class DataTransport {
                 } else if let dt = data {
                     do {
                         let dic = try JSONSerialization.jsonObject(with: dt, options: .mutableLeaves)
-                        completionHandler(weakSelf.parseDic(dic, nodePath))
+                        completionHandler(dic)
                     } catch  {
                         weakSelf.errors.append(error)
                         completionHandler([:])

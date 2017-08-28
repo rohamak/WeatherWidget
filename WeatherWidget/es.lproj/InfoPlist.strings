@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  WeatherWidget
+
+  Created by Roham Akbari on 2017-08-28.
+  Copyright © 2017 bioDigits LTD. All rights reserved.
+*/
+CFBundleDisplayName = "WeatherWidget";
+
+NSLocationWhenInUseUsageDescription = "Clima actual de la ubicación";

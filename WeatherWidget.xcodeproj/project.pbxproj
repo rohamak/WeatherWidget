@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C850EB51F53A79E00C2C8A7 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C850EB41F53A79E00C2C8A7 /* LocationManager.swift */; };
+		0C850EB81F53F8D400C2C8A7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0C850EB61F53F8D400C2C8A7 /* InfoPlist.strings */; };
 		0CA0795F1F4CAFFA003AE9FF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0795E1F4CAFFA003AE9FF /* AppDelegate.swift */; };
 		0CA079611F4CAFFA003AE9FF /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA079601F4CAFFA003AE9FF /* MasterViewController.swift */; };
 		0CA079631F4CAFFA003AE9FF /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA079621F4CAFFA003AE9FF /* DetailViewController.swift */; };
@@ -17,6 +19,7 @@
 		0CA079811F4CAFFA003AE9FF /* WeatherWidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA079801F4CAFFA003AE9FF /* WeatherWidgetUITests.swift */; };
 		0CA079921F4CB576003AE9FF /* CityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA079911F4CB576003AE9FF /* CityModel.swift */; };
 		0CA079951F4CB901003AE9FF /* DataTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA079941F4CB901003AE9FF /* DataTransport.swift */; };
+		0CA079A81F537211003AE9FF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0CA079A61F537211003AE9FF /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +40,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C850EB41F53A79E00C2C8A7 /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		0C850EB71F53F8D400C2C8A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0C850EB91F53F94600C2C8A7 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0CA0795B1F4CAFFA003AE9FF /* WeatherWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA0795E1F4CAFFA003AE9FF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0CA079601F4CAFFA003AE9FF /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -53,6 +59,8 @@
 		0CA079821F4CAFFA003AE9FF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CA079911F4CB576003AE9FF /* CityModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CityModel.swift; sourceTree = "<group>"; };
 		0CA079941F4CB901003AE9FF /* DataTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataTransport.swift; sourceTree = "<group>"; };
+		0CA079A71F537211003AE9FF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = WeatherWidget/Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0CA079AA1F5372B9003AE9FF /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = WeatherWidget/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,8 +114,7 @@
 				0CA0798E1F4CB01F003AE9FF /* Models */,
 				0CA0798F1F4CB027003AE9FF /* Views */,
 				0CA079901F4CB032003AE9FF /* Controllers */,
-				0CA079671F4CAFFA003AE9FF /* Assets.xcassets */,
-				0CA0796C1F4CAFFA003AE9FF /* Info.plist */,
+				0CA079A91F537233003AE9FF /* Resources */,
 			);
 			path = WeatherWidget;
 			sourceTree = "<group>";
@@ -154,6 +161,7 @@
 				0CA0795E1F4CAFFA003AE9FF /* AppDelegate.swift */,
 				0CA079601F4CAFFA003AE9FF /* MasterViewController.swift */,
 				0CA079621F4CAFFA003AE9FF /* DetailViewController.swift */,
+				0C850EB41F53A79E00C2C8A7 /* LocationManager.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -164,6 +172,17 @@
 				0CA079941F4CB901003AE9FF /* DataTransport.swift */,
 			);
 			name = Helpers;
+			sourceTree = "<group>";
+		};
+		0CA079A91F537233003AE9FF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0CA079A61F537211003AE9FF /* Localizable.strings */,
+				0CA079671F4CAFFA003AE9FF /* Assets.xcassets */,
+				0CA0796C1F4CAFFA003AE9FF /* Info.plist */,
+				0C850EB61F53F8D400C2C8A7 /* InfoPlist.strings */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -258,6 +277,7 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = 0CA079521F4CAFFA003AE9FF;
 			productRefGroup = 0CA0795C1F4CAFFA003AE9FF /* Products */;
@@ -277,8 +297,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CA0796B1F4CAFFA003AE9FF /* LaunchScreen.storyboard in Resources */,
+				0CA079A81F537211003AE9FF /* Localizable.strings in Resources */,
 				0CA079681F4CAFFA003AE9FF /* Assets.xcassets in Resources */,
 				0CA079661F4CAFFA003AE9FF /* Main.storyboard in Resources */,
+				0C850EB81F53F8D400C2C8A7 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +327,7 @@
 			files = (
 				0CA079631F4CAFFA003AE9FF /* DetailViewController.swift in Sources */,
 				0CA079611F4CAFFA003AE9FF /* MasterViewController.swift in Sources */,
+				0C850EB51F53A79E00C2C8A7 /* LocationManager.swift in Sources */,
 				0CA079921F4CB576003AE9FF /* CityModel.swift in Sources */,
 				0CA079951F4CB901003AE9FF /* DataTransport.swift in Sources */,
 				0CA0795F1F4CAFFA003AE9FF /* AppDelegate.swift in Sources */,
@@ -343,6 +366,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		0C850EB61F53F8D400C2C8A7 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0C850EB71F53F8D400C2C8A7 /* Base */,
+				0C850EB91F53F94600C2C8A7 /* es */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		0CA079641F4CAFFA003AE9FF /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -359,6 +391,16 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		0CA079A61F537211003AE9FF /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0CA079A71F537211003AE9FF /* Base */,
+				0CA079AA1F5372B9003AE9FF /* es */,
+			);
+			name = Localizable.strings;
+			path = ..;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -366,6 +408,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -417,6 +460,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -560,6 +604,7 @@
 				0CA079871F4CAFFA003AE9FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0CA079881F4CAFFA003AE9FF /* Build configuration list for PBXNativeTarget "WeatherWidgetTests" */ = {
 			isa = XCConfigurationList;
@@ -568,6 +613,7 @@
 				0CA0798A1F4CAFFA003AE9FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0CA0798B1F4CAFFA003AE9FF /* Build configuration list for PBXNativeTarget "WeatherWidgetUITests" */ = {
 			isa = XCConfigurationList;
@@ -576,6 +622,7 @@
 				0CA0798D1F4CAFFA003AE9FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

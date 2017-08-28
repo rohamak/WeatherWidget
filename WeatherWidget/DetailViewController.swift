@@ -15,11 +15,16 @@ class ForecastCell: UITableViewCell {
     @IBOutlet weak var lblMin: UILabel!
     @IBOutlet weak var lblMax: UILabel!
     @IBOutlet weak var lblWeatherMain: UILabel!
+    @IBOutlet weak var lblWind: UILabel!
     @IBOutlet weak var lblWindSpeed: UILabel!
     @IBOutlet weak var lblWindDirection: UILabel!
     
     var task: URLSessionDataTask?
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        lblWind.text    =   NSLocalizedString(lblWind.text ?? "", comment: "")
+    }
     // Make sure there is no left over task when cells are de-initialised
     deinit {
         if let tsk = task {
@@ -34,6 +39,7 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var lblWeatherMain: UILabel!
     @IBOutlet weak var lblTemperature: UILabel!
     @IBOutlet weak var lblUnit: UILabel!
+    @IBOutlet weak var lblWind: UILabel!
     @IBOutlet weak var lblWindSpeed: UILabel!
     @IBOutlet weak var lblWindDirection: UILabel!
     @IBOutlet weak var tbl: UITableView!
@@ -41,6 +47,12 @@ class DetailViewController: UIViewController {
     let forecastCellId = "ForecastCell"
     var curIndex = 0
     var cities: [City]? {
+        didSet {
+            // Update the view.
+            configureView()
+        }
+    }
+    var latLon: LatLon? {
         didSet {
             // Update the view.
             configureView()
@@ -85,6 +97,9 @@ class DetailViewController: UIViewController {
         tbl.layer.cornerRadius = 10.0
         tbl.layer.borderWidth = 1.0
         tbl.layer.borderColor = UIColor.darkGray.cgColor
+        
+        lblWind.text    =   NSLocalizedString(lblWind.text ?? "", comment: "")
+        
         configureView()
     }
 
@@ -106,16 +121,18 @@ extension DetailViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: self.forecastCellId) as! ForecastCell
-        if let wc = self.cities?[curIndex].WForecast[indexPath.row] {
-            cell.lblWeekday.text = wc.fmtDate
+        if let c = self.cities?[curIndex],
+            indexPath.row < c.WForecast.count {
+            let wf = c.WForecast[indexPath.row]
+            cell.lblWeekday.text = wf.fmtDate
             //cell.imgWeatherIcon.image = icon
-            cell.lblMin.text = String(format: "%.0f", wc.min)
-            cell.lblMax.text = String(format: "%.0f", wc.max)
-            cell.lblWeatherMain.text = wc.weatherMain + " " + wc.weatherDesc
-            cell.lblWindSpeed.text = wc.fmtWindSpeed
-            cell.lblWindDirection.text = wc.fmtWindDir
-
-            cell.task = self.cities?[curIndex].loadImage(wc.weatherIcon, completionHandler: { image in
+            cell.lblMin.text = String(format: "%.0f", wf.min)
+            cell.lblMax.text = String(format: "%.0f", wf.max)
+            cell.lblWeatherMain.text = wf.weatherMain + " " + wf.weatherDesc
+            cell.lblWindSpeed.text = wf.fmtWindSpeed
+            cell.lblWindDirection.text = wf.fmtWindDir
+            
+            cell.task = self.cities?[curIndex].loadImage(wf.weatherIcon, completionHandler: { image in
                 if let image = image {
                     DispatchQueue.main.sync {
                         cell.imgWeatherIcon.image = image
